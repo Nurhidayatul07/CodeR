@@ -1,0 +1,445 @@
+Additional ref:
+
+install.packages("plyr")
+install.packages("readr")
+install.packages("tidyverse")
+install.packages("ggplot2", dependencies = TRUE)
+install.packages("psych")
+install.packages("openxlsx")
+install.packages("rio")
+install.packages("quantmod")
+install.packages("ggpubr")
+install.packages("plotly")
+library(plotly)
+library(ggpubr)
+library(quantmod)
+library(rio)
+library(openxlsx)
+library(psych)
+library(ggplot2)
+library(plyr)
+library(readr)
+library(tidyverse)
+
+#set working directory
+setwd("C:/Users/fathi/OneDrive/Documents/Ain/Master/Sem 5/Dataset")
+
+#Merge daily data 2019
+mydir = "ASX 2019"
+myfiles1 = list.files(path=mydir, pattern="*.txt", full.names=TRUE)
+myfiles1
+dat_txt = ldply(myfiles1, read.table)
+dat_txt
+write.table(dat_txt, "ASX 2019.txt", sep=",")
+
+#Merge daily data 2018
+mydir2 = "ASX 2018"
+myfiles2 = list.files(path=mydir2, pattern="*.txt", full.names=TRUE)
+myfiles2
+dat_txt2 = ldply(myfiles2, read.table)
+dat_txt2
+write.table(dat_txt2, "ASX 2018.txt", sep=",")
+
+#Merge daily data 2017
+mydir3 = "ASX 2017"
+myfiles3 = list.files(path=mydir3, pattern="*.txt", full.names=TRUE)
+myfiles3
+dat_txt3 = ldply(myfiles3, read.table)
+dat_txt3
+write.table(dat_txt3, "ASX 2017.txt", sep=",")
+
+#from txt convert to dataframe in R
+#before import dataset, need to add column name in the txt file, delete all " and replace coma with space
+#need to import dataset at Environment window
+
+#export the data frame to excel
+export(ASX.2019, "ASX 2019.xlsx")
+export(ASX.2018, "ASX 2018.xlsx")
+export(ASX.2017, "ASX 2017.xlsx")
+
+#summary of statistics info for the data
+#Findings: No NA values
+summary(ASX.2019)
+summary(ASX.2018)
+summary(ASX.2017)
+
+#No of rows for each integrated datasets
+nrow(ASX.2019)
+nrow(ASX.2018)
+nrow(ASX.2017)
+
+#check for NA values
+is.na(ASX.2019)
+is.na(ASX.2018)
+is.na(ASX.2017)
+
+#add column to the data
+ASX.2019$Percentage_Change_HighLow <- abs(ASX.2019[,5]/ASX.2019[,6]-1)*100
+ASX.2019$Percentage_Change_OpenClose <- abs(ASX.2019[,7]/ASX.2019[,4]-1)*100
+summary(ASX.2019)
+
+ASX.2018$Percentage_Change_HighLow <- (ASX.2018[,5]/ASX.2018[,6]-1)*100
+ASX.2018$Percentage_Change_OpenClose <- abs(ASX.2018[,7]/ASX.2018[,4]-1)*100
+summary(ASX.2018)
+
+ASX.2017$Percentage_Change_HighLow <- (ASX.2017[,5]/ASX.2017[,6]-1)*100
+ASX.2017$Percentage_Change_OpenClose <- abs(ASX.2017[,7]/ASX.2017[,4]-1)*100
+summary(ASX.2017)
+
+#sort alphabetically
+#ASX.2019 <- ASX.2019[order(ASX.2019$Ticker),]
+#ASX.2019
+
+#export latest data
+export(ASX.2019, "Latest 2019.xlsx")
+export(ASX.2018, "Latest 2018.xlsx")
+export(ASX.2017, "Latest 2017.xlsx")
+
+############################_Data visualization_##############################
+#create sample data from latest data 2019, 2018, 2017
+sample1 <- ASX.2019[which(ASX.2019$Ticker == "RAP"),names(ASX.2019) %in% c("Ticker","Date","Open","High","Low","Close","Volume","Change_HighLow","Change_OpenClose")]
+sample2 <- ASX.2019[which(ASX.2019$Ticker == "A2M"),names(ASX.2019) %in% c("Ticker","Date","Open","High","Low","Close","Volume","Change_HighLow","Change_OpenClose")]
+sample3 <- ASX.2019[which(ASX.2019$Ticker == "4DS"),names(ASX.2019) %in% c("Ticker","Date","Open","High","Low","Close","Volume","Change_HighLow","Change_OpenClose")]
+#if need to combine : sample_data <- rbind(sample1,sample2,sample3)
+
+sample1_2018 <- ASX.2018[which(ASX.2018$Ticker == "RAP"),names(ASX.2018) %in% c("Ticker","Date","Open","High","Low","Close","Volume","Change_HighLow","Change_OpenClose")]
+sample2_2018 <- ASX.2018[which(ASX.2018$Ticker == "A2M"),names(ASX.2018) %in% c("Ticker","Date","Open","High","Low","Close","Volume","Change_HighLow","Change_OpenClose")]
+sample3_2018 <- ASX.2018[which(ASX.2018$Ticker == "4DS"),names(ASX.2018) %in% c("Ticker","Date","Open","High","Low","Close","Volume","Change_HighLow","Change_OpenClose")]
+
+sample1_2017 <- ASX.2017[which(ASX.2017$Ticker == "RAP"),names(ASX.2017) %in% c("Ticker","Date","Open","High","Low","Close","Volume","Change_HighLow","Change_OpenClose")]
+sample2_2017 <- ASX.2017[which(ASX.2017$Ticker == "A2M"),names(ASX.2017) %in% c("Ticker","Date","Open","High","Low","Close","Volume","Change_HighLow","Change_OpenClose")]
+sample3_2017 <- ASX.2017[which(ASX.2017$Ticker == "4DS"),names(ASX.2017) %in% c("Ticker","Date","Open","High","Low","Close","Volume","Change_HighLow","Change_OpenClose")]
+
+#change format of column date from integer to date
+str(sample1$Date)
+sample1 <- transform(sample1, Date = as.Date(as.character(Date), "%Y%m%d"))
+sample2 <- transform(sample2, Date = as.Date(as.character(Date), "%Y%m%d"))
+sample3 <- transform(sample3, Date = as.Date(as.character(Date), "%Y%m%d"))
+str(sample1$Date)
+
+sample1_2018 <- transform(sample1_2018, Date = as.Date(as.character(Date), "%Y%m%d"))
+sample2_2018 <- transform(sample2_2018, Date = as.Date(as.character(Date), "%Y%m%d"))
+sample3_2018 <- transform(sample3_2018, Date = as.Date(as.character(Date), "%Y%m%d"))
+str(sample1_2018$Date)
+
+sample1_2017 <- transform(sample1_2017, Date = as.Date(as.character(Date), "%Y%m%d"))
+sample2_2017 <- transform(sample2_2017, Date = as.Date(as.character(Date), "%Y%m%d"))
+sample3_2017 <- transform(sample3_2017, Date = as.Date(as.character(Date), "%Y%m%d"))
+str(sample1_2017$Date)
+
+#1Trend for close price in Q1 each stocks
+#RAP, A2M, 4DS
+#reuse the code
+
+p1 <- ggplot() + geom_line(aes(y = Close, x = Date),
+                           data = sample1) +
+  labs(title = "Close Price Trend in 1Q2019 (Ticker:RAP)", x = "Month", y = "Close Price")+
+  theme(text=element_text(family="Tahoma"))
+p1
+
+
+p2 <- ggplot() + geom_line(aes(y = Close, x = Date),
+                           data = sample4_2018) +
+  labs(title = "Close Price Trend in 1Q2018 (Ticker:5GN)", x = "Month", y = "Close Price")+
+  theme(text=element_text(family="Tahoma"))
+p2
+
+
+p3 <- ggplot() + geom_line(aes(y = Close, x = Date),
+                           data = sample4) +
+  labs(title = "Close Price Trend in 1Q2019 (Ticker:5GN)", x = "Month", y = "Close Price")+
+                theme(text=element_text(family="Tahoma"))
+p3
+
+
+ggarrange(p1, p2, p3 + rremove("x.text"), 
+          ncol = 1, nrow = 3)
+
+#2Combination of prices chart (open,high,low,close)
+#RAP, A2M, 4DS
+#reuse the code
+
+p<-ggplot()+
+  geom_line(data=sample3,aes(y=Open,x= Date,colour="red"),size=1 )+
+  geom_line(data=sample3,aes(y=High,x= Date,colour="green"),size=1) +
+  geom_line(data=sample3,aes(y=Low,x= Date,colour="blue"),size=1 )+
+  geom_line(data=sample3,aes(y=Close,x= Date,colour="purple"),size=1) +
+  scale_color_discrete(name = "Legend", labels = c("Open", "High","Low","Close"))
+p + ggtitle("Open,High,Low,Close 2019 (Ticker:4DS)") +
+  xlab("Date") + ylab("Price")
+
+#3Candlestick chart
+#RAP, A2M, 4DS
+#reuse the code
+
+p4 <- sample2_2018 %>% plot_ly(x = ~Date, type="candlestick",
+                              open = ~Open, close = ~Close,
+                              high = ~High, low = ~Low, name = "A2M") %>%
+                      layout(title="CandleStick Chart 2018 (Ticker:A2M)")
+p4 <- p4 %>% layout(yaxis = list(title = "Price"))
+p4
+
+#create volume bar "RAP"
+p5 <- sample2_2018
+p5 <- p5 %>% plot_ly(x=~Date, y=~Volume, type='bar', name = "A2M Volume",
+                          colors = c('#17BECF','#7F7F7F')) 
+p5 <- p5 %>% layout(yaxis = list(title = "Volume"))
+p5
+
+#create rangeselector button
+#rs <- list(visible = TRUE, x = 0.5, y = -0.055,
+           #xanchor = 'center', yref = 'paper',
+           #font = list(size = 9),
+           #buttons = list(
+            # list(count=1,
+             #     label='RESET',
+             #     step='all'),
+             #list(count=1,
+             #     label='1 YR',
+              #    step='year',
+               #   stepmode='backward'),
+             #list(count=3,
+              #    label='3 MO',
+               #   step='month',
+               #   stepmode='backward'),
+             #list(count=1,
+                #  label='1 MO',
+                #  step='month',
+                #  stepmode='backward')
+          # ))
+
+#merge chart p4 and p5
+p6 <- subplot(p4, p5, heights = c(0.7,0.2), nrows=2,
+               shareX = TRUE, titleY = TRUE)
+p6 <- p6 %>% layout(title = "CandleStick Chart 2018 (Ticker:A2M)",
+                      xaxis = list(rangeslider = list(visible = F)),
+                      legend = list(orientation = 'h', x = 0.5, y = 1,
+                                    xanchor = 'center', yref = 'paper',
+                                    font = list(size = 10),
+                                    bgcolor = 'transparent'))
+p6
+
+########################_Data Manipulation_#############################
+
+#Find standard deviation and volume of each stocks in 2019 (std of Change_HighLow)
+stdhl_2019 <- tapply(ASX.2019$Percentage_Change_HighLow, ASX.2019$Ticker,sd)
+volume_2019 <- tapply(ASX.2019$Volume, ASX.2019$Ticker, sum)
+stdoc_2019 <- tapply(ASX.2019$Percentage_Change_OpenClose, ASX.2019$Ticker, sd)
+std_new3 <- cbind(stdhl_2019,volume_2019,stdoc_2019 )
+write.table(std_new3, "STD 2019.txt", sep=",")
+
+#Find standard deviation and volume of each stocks in 2018 (std of Change_HighLow)
+stdhl_2018<- tapply(ASX.2018$Percentage_Change_HighLow, ASX.2018$Ticker, sd)
+volume_2018 <- tapply(ASX.2018$Volume, ASX.2018$Ticker, sum)
+stdoc_2018 <- tapply(ASX.2018$Percentage_Change_OpenClose, ASX.2018$Ticker, sd)
+std_new <- cbind(stdhl_2018,volume_2018,stdoc_2018)
+write.table(std_new, "STD 2018.txt", sep=",")
+
+#Find standard deviation and volume of each stocks in 2017 (std of Change_HighLow)
+stdhl_2017 <- tapply(ASX.2017$Percentage_Change_HighLow, ASX.2017$Ticker, sd)
+volume_2017 <- tapply(ASX.2017$Volume, ASX.2017$Ticker, sum)
+stdoc_2017 <- tapply(ASX.2017$Percentage_Change_OpenClose, ASX.2017$Ticker, sd)
+std_new2 <- cbind(stdhl_2017,volume_2017,stdoc_2017 )
+write.table(std_new2, "STD 2017.txt", sep=",")
+
+summary(ASX.2019)
+summary(ASX.2018)
+summary(ASX.2017)
+
+#Match the same stocks for 3 years 
+new_data <- semi_join(STD.2017,STD.2018, by="Ticker")
+new_data
+
+#2017
+newdata_2017 <- semi_join(new_data,STD.2019, by="Ticker")
+
+#2019
+newdata_2019 <- semi_join(STD.2019,newdata_2017, by="Ticker")
+
+#2018
+newdata_2018 <- semi_join(STD.2018,newdata_2019, by="Ticker")
+
+#Combine columns and drop colums
+main_data <- cbind(newdata_2019,newdata_2018,newdata_2017)
+main_data1 <- main_data[-c(5,9)]
+
+#change column name
+names(main_data1)[2] <- "STD_HighLow_2017"
+names(main_data1)[5] <- "STD_HighLow_2018"
+names(main_data1)[8] <- "STD_HighLow_2019"
+
+names(main_data1)[4] <- "STD_OpenClose_2017"
+names(main_data1)[7] <- "STD_OpenClose_2018"
+names(main_data1)[10] <- "STD_OpenClose_2019"
+
+names(main_data1)[3] <- "Volume_Q12017"
+names(main_data1)[6] <- "Volume_Q12018"
+names(main_data1)[9] <- "Volume_Q12019"
+
+#rearrange columns
+main_data2 <- main_data1[, c(1, 2, 4, 3, 5, 7, 6, 8, 10, 9)]
+
+#check for NA values
+#delete rows with NA in one column ( 22 rows only)
+summary(main_data2)
+is.na(main_data2)
+complete.cases(main_data2)
+main_data3 <- main_data2[complete.cases(main_data2), ]
+write.table(main_data3, "main_data3.txt", sep=",")
+export(main_data3, "Main Data 3.xlsx")
+
+#add new column to compare the std between 2019 and mean of std 2017+2018
+main_data3$STD_HighLow_percentage_comparison <- abs((main_data3[,8]/((main_data3[,2]+main_data3[,5])/2)-1)*100)
+main_data3$STD_OpenClose_percentage_comparison <- abs((main_data3[,9]/((main_data3[,3]+main_data3[,6])/2)-1)*100) 
+main_data3$Volume_percentage_comparison <- abs((main_data3[,10]/((main_data3[,4]+main_data3[,7])/2)-1)*100)
+
+nrow(main_data3[main_data3$STD_HighLow_percentage_comparison>50, ])
+nrow(main_data3[main_data3$STD_OpenClose_percentage_comparison>50, ])
+nrow(main_data3[main_data3$Volume_percentage_comparison>50, ])
+
+#check and delete NA value (29 rows deleted)
+summary(main_data3)
+complete.cases(main_data3)
+main_data4 <- main_data3[complete.cases(main_data3), ]
+summary(main_data4)
+write.table(main_data4, file = "main_data4.txt", sep = "\t",
+            row.names = FALSE)
+export(main_data4,"Main Data 4.xlsx")
+
+#Data visualization for the manipulated dataset (sample of 1 stocks)
+#Combine the data and melt it and get data_m
+data_m
+nrow(data_m)
+names(data_m)[2] <- "Legend"
+
+#Dont run this code to get same sample: subset.Ticker=sample(unique(data_m$Ticker), 5, replace=F)
+p7 <- ggplot(data_m, aes(Ticker, value, fill = Legend)) + 
+  geom_bar(stat = "identity") + 
+  scale_x_discrete(limits=subset.Ticker)+
+  xlab("Ticker") + 
+  ylab("Standard Deviation")+ theme(axis.text.x = element_text(angle = 90, hjust = 0)
+  )+
+  ggtitle("Stacked Chart of Standard Deviation for 3 years")
+p7 + geom_text(aes(label = value), size = 3, hjust = 0.5, vjust = 1, position =     "stack")
+
+############################_ModeL Building_######################################
+
+#Add desired output column to main_data4 (yes or no manipulative)
+main_data4$Possible_manipulative <- ifelse (main_data4$STD_HighLow_percentage_comparison>=50 & main_data4$STD_OpenClose_percentage_comparison>=50 | main_data4$Volume_percentage_comparison>=80, "True","False") 
+length(which(main_data4$Possible_manipulative=="False"))
+length(which(main_data4$Possible_manipulative=="True"))
+summary(main_data4)
+main_data4[main_data4 == Inf] <- 0
+summary(main_data4)
+
+#Split train and test data
+set.seed(123)
+sample_size <-  floor(0.70 * nrow(main_data4))
+main_data4 <- main_data4[sample(nrow(main_data4)),] 
+main.train <- main_data4[1:sample_size, ]
+main.test <- main_data4[(sample_size+1):nrow(main_data4), ] 
+
+View(main.train)
+nrow(main.train)
+View(main.test)
+nrow(main.test)
+
+prop.table(table(main.train$Possible_manipulative))
+prop.table(table(main.test$Possible_manipulative))
+
+
+#1Decision tree
+install.packages("rpart.plot")
+install.packages("rattle")
+library(rpart)
+library(rpart.plot)
+library(RColorBrewer)
+
+tree <- rpart(Possible_manipulative ~ STD_HighLow_percentage_comparison + STD_OpenClose_percentage_comparison+ Volume_percentage_comparison,
+             data = main.train, 
+             method = 'class')
+
+# plot beautiful mytree
+fancyRpartPlot(tree, caption = "Decision Tree")
+
+#predict test data
+predict_test <- predict(fit, main.test, type = 'class')
+base_accuracy <- mean(predict_test == main.test$Possible_manipulative)
+
+#pruning
+fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"]
+fit$variable.importance
+printcp(tree)
+plotcp(fit)
+
+#preprun and postprun
+preprun <- rpart(Possible_manipulative ~ ., data = main.train, method = "class", 
+                          control = rpart.control(cp = 0, maxdepth = 8,minsplit = 100))
+
+
+prune_tree <- predict(preprun, main.test, type = "class")
+accuracy_preprun <- mean(predict_test == main.test$Possible_manipulative)
+
+prune_tree <- prune(tree, cp = 0.01 )
+
+predict_test<- predict(prune_tree, main.test, type = "class")
+accuracy_postprun <- mean(predict_test == main.test$Possible_manipulative)
+data.frame(base_accuracy, accuracy_preprun, accuracy_postprun)
+
+predict_test <- predict(fit, main.test, type = 'class')
+table_matrix <- table(main.test$Possible_manipulative, predict_test)
+table_matrix
+
+#Confusion Matrix
+confusionMatrix(table(predict_test,main.test$Possible_manipulative))
+accuracy_Test <- sum(diag(table_matrix)) / sum(table_matrix)
+print(paste('Accuracy for test', accuracy_Test))
+
+
+#2Naive Bayes 
+install.packages("caret")
+library(caret)
+library(lattice)
+library(e1071)
+
+x = main.train[,-14]
+y = main.train$Possible_manipulative
+
+#Build model
+model = train(x,y,'nb',trControl=trainControl(method='cv',number=10))
+model
+
+#Predict test data
+Predict <- predict(model,newdata = main.test )
+Predict
+
+#Evaluate model
+confusionMatrix(table(Predict,main.test$Possible_manipulative))
+
+#2SVM 
+
+main.train <- main.train[-2,]
+main.train <- do.call(data.frame,                      # Replace Inf in data by NA
+                   lapply(main.train,
+                          function(x) replace(x, is.infinite(x), NA)))
+summary(main.train)
+complete.cases(main.train)
+main.train <- main.train[complete.cases(main.train), ]
+summary(main.train)
+
+trctrl <- trainControl(method = "repeatedcv", number = 10, repeats = 2)
+svm_Linear <- train(Possible_manipulative ~ STD_HighLow_percentage_comparison + 
+                    Volume_percentage_comparison + STD_OpenClose_percentage_comparison,
+                    data = main.train, method = "svmLinear",
+                    trControl=trctrl,
+                    preProcess = c("center", "scale"),
+                    tuneLength = 4)
+svm_Linear
+
+#predict model using test data
+test_pred <- predict(svm_Linear, newdata = main.test)
+test_pred
+
+#confusion matrix
+confusionMatrix(table(test_pred, main.test$Possible_manipulative))
+
