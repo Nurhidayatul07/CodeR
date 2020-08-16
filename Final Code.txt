@@ -1,4 +1,3 @@
-Additional ref:
 
 install.packages("plyr")
 install.packages("readr")
